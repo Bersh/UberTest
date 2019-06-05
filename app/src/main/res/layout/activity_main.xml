@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/edit_search"
+        android:id="@+id/editSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@android:string/search_go"
@@ -17,8 +17,8 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_images"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvImages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="10dp"/>
