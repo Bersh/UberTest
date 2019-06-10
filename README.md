@@ -1,7 +1,7 @@
 # Application for Uber coding challenge
 
 ## How to build the application
-Application uses Gradle build system. You can build it locally running thsi command: 
+Application uses Gradle build system. You can build it locally running this command: 
 `./gradlew assemble`
 
 ## Using existing apk 
