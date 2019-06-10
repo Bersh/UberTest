@@ -24,7 +24,7 @@ class SearchImagesApiJSONParser {
     fun parseSearchListResponse(jsonObject: JSONObject): PhotosResponse? {
         try {
             if (jsonObject.has(KEY_STAT)) {
-                if (jsonObject.getString(KEY_STAT).contentEquals(KEY_OK)) {
+                if (jsonObject.getString(KEY_STAT)?.contentEquals(KEY_OK) == true) {
                     val resultObject = jsonObject.getJSONObject(KEY_PHOTOS_JSON)
                     val jsonArray = resultObject.getJSONArray(KEY_PHOTOS_ARRAY)
                     return PhotosResponse(

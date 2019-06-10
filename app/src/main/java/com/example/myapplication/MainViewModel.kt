@@ -10,26 +10,25 @@ import com.example.myapplication.model.repository.IPhotosRepository
 import com.example.myapplication.model.repository.PhotosRepositoryImpl
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
-
-    //To avoid publishing MutableLiveData we will hide it and publish wrapping LiveData instead
-    private val imagesState = MutableLiveData<List<FlickrPhoto>>()
-    private val page = MutableLiveData<Int>().apply { value = 1 }
-    private val pagesCount = MutableLiveData<Int>()
-    private val userMessageState = MutableLiveData<String>()
-    private val isLoadingState = MutableLiveData<Boolean>().apply { value = false }
-    private val currentQuery = MutableLiveData<String>().apply { value = "" }
-
+    @VisibleForTesting
+    val currentQuery = MutableLiveData<String>().apply { value = "" }
+    @VisibleForTesting
+    val userMessage = MutableLiveData<String>()
     @VisibleForTesting
     var photosRepository: IPhotosRepository = PhotosRepositoryImpl()
-
-    val images: LiveData<List<FlickrPhoto>> get() = imagesState
-    val isLoading: LiveData<Boolean> get() = isLoadingState
-    val userMessage: LiveData<String> get() = userMessageState
+    @VisibleForTesting
+    val isLoading = MutableLiveData<Boolean>().apply { value = false }
+    @VisibleForTesting
+    val images = MutableLiveData<List<FlickrPhoto>>()
+    @VisibleForTesting
+    val page = MutableLiveData<Int>().apply { value = 1 }
+    @VisibleForTesting
+    val pagesCount = MutableLiveData<Int>()
 
     fun getDefaultImages() {
         currentQuery.value = ""
         photosRepository.getDefaultPhotos(
-            page.value ?: 1, imagesState, pagesCount, userMessageState, isLoadingState
+            page.value ?: 1, images, pagesCount, userMessage, isLoading
         )
     }
 
@@ -40,12 +39,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
         currentQuery.value = searchQuery
         photosRepository.getPhotosForQuery(
-            searchQuery, page.value ?: 1, imagesState, pagesCount, userMessageState, isLoadingState
+            searchQuery, page.value ?: 1, images, pagesCount, userMessage, isLoading
         )
     }
 
     fun loadNextPage() {
-        if (isLoadingState.value == true) { //loading in progress
+        if (isLoading.value == true) { //loading in progress
             return
         }
         var currentPage = page.value ?: 1
@@ -53,11 +52,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             page.value = ++currentPage
             photosRepository.getPhotosForQuery(
                 currentQuery.value ?: "", currentPage,
-                imagesState, pagesCount, userMessageState, isLoadingState
+                images, pagesCount, userMessage, isLoading
             )
         } else {
-            userMessageState.value = getApplication<Application>().getString(R.string.txt_all_pages_loaded)
-            isLoadingState.value = false
+            userMessage.value = getApplication<Application>().getString(R.string.txt_all_pages_loaded)
+            isLoading.value = false
         }
     }
 }

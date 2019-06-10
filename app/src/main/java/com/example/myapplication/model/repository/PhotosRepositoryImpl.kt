@@ -37,7 +37,6 @@ class PhotosRepositoryImpl : IPhotosRepository {
         ).execute()
     }
 
-
     override fun getDefaultPhotos(
         pageNo: Int,
         imagesData: MutableLiveData<List<FlickrPhoto>>,
