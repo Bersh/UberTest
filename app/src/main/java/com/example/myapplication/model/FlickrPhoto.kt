@@ -1,7 +1,7 @@
 package com.example.myapplication.model
 
 data class FlickrPhoto(
-    var id: String,
+    var id: Long,
     var owner: String,
     var secret: String,
     var server: String,

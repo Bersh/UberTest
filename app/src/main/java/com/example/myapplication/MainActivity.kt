@@ -2,6 +2,8 @@ package com.example.myapplication
 
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
@@ -20,8 +22,8 @@ class MainActivity : AppCompatActivity() {
     private var adapter = ImagesAdapter()
     private lateinit var layoutManager: GridLayoutManager
 
-    private val viewModel: MyViewModel by lazy {
-        ViewModelProviders.of(this).get(MyViewModel::class.java)
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProviders.of(this).get(MainViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +49,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        viewModel.isLoading.observe(this, Observer<Boolean> { isLoading ->
+            progress.visibility = if (isLoading) VISIBLE else GONE
+        })
+
         editSearch.setOnEditorActionListener(object : TextView.OnEditorActionListener {
             override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -61,9 +67,8 @@ class MainActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) {
                     val totalItemCount = layoutManager.itemCount
-                    val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
-                    //start loading next page before the last row
-                    if (lastVisiblePosition >= (totalItemCount - COLUMN_COUNT)) {
+                    val lastVisiblePosition = layoutManager.findLastVisibleItemPosition() + 1
+                    if (lastVisiblePosition >= totalItemCount) {
                         viewModel.loadNextPage()
                     }
                 }

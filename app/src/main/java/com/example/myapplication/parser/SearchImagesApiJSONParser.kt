@@ -45,7 +45,7 @@ class SearchImagesApiJSONParser {
             for (i in 0 until jsonArray.length()) {
                 val jsonObj = jsonArray.getJSONObject(i)
                 val flickrPhoto = FlickrPhoto(
-                    jsonObj.getString(KEY_PHOTO_ID),
+                    jsonObj.getLong(KEY_PHOTO_ID),
                     jsonObj.getString(KEY_OWNER),
                     jsonObj.getString(KEY_SECRET),
                     jsonObj.getString(KEY_SERVER),

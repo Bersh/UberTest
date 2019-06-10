@@ -4,12 +4,12 @@ import android.os.AsyncTask
 import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.myapplication.model.Result
 import com.example.myapplication.common.TIMEOUT
 import com.example.myapplication.common.URL_GET_RECENT
 import com.example.myapplication.common.URL_SEARCH
 import com.example.myapplication.model.FlickrPhoto
 import com.example.myapplication.model.PhotosResponse
+import com.example.myapplication.model.Result
 import com.example.myapplication.parser.SearchImagesApiJSONParser
 import org.json.JSONException
 import org.json.JSONObject
@@ -73,12 +73,10 @@ class PhotosRepositoryImpl : IPhotosRepository {
         }
 
         override fun doInBackground(vararg params: Unit): Result<Exception, PhotosResponse?> {
-            val jsonObject = fetchPhotos(searchText, pageNo)
-            return Result.build { jsonParser.parseSearchListResponse(jsonObject) }
+            return Result.build { jsonParser.parseSearchListResponse(fetchPhotos(searchText, pageNo)) }
         }
 
         override fun onPostExecute(result: Result<Exception, PhotosResponse?>) {
-//            userMessageData.get()?.value = "Page $pageNo loaded" //TODO remove
             when (result) {
                 is Result.Value -> result.value?.let {
                     currentPhotosList.addAll(it.flickrPhotoList)

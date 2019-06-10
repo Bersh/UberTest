@@ -6,9 +6,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.myapplication.model.FlickrPhoto
+import com.example.myapplication.model.repository.IPhotosRepository
 import com.example.myapplication.model.repository.PhotosRepositoryImpl
 
-class MyViewModel(app: Application) : AndroidViewModel(app) {
+class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     //To avoid publishing MutableLiveData we will hide it and publish wrapping LiveData instead
     private val imagesState = MutableLiveData<List<FlickrPhoto>>()
@@ -19,10 +20,10 @@ class MyViewModel(app: Application) : AndroidViewModel(app) {
     private val currentQuery = MutableLiveData<String>().apply { value = "" }
 
     @VisibleForTesting
-    var photosRepository = PhotosRepositoryImpl()
+    var photosRepository: IPhotosRepository = PhotosRepositoryImpl()
 
     val images: LiveData<List<FlickrPhoto>> get() = imagesState
-    val isLoading: LiveData<Boolean> get() = isLoadingState //TODO use this to show progress bar if needed
+    val isLoading: LiveData<Boolean> get() = isLoadingState
     val userMessage: LiveData<String> get() = userMessageState
 
     fun getDefaultImages() {
@@ -54,7 +55,6 @@ class MyViewModel(app: Application) : AndroidViewModel(app) {
                 currentQuery.value ?: "", currentPage,
                 imagesState, pagesCount, userMessageState, isLoadingState
             )
-
         } else {
             userMessageState.value = getApplication<Application>().getString(R.string.txt_all_pages_loaded)
             isLoadingState.value = false

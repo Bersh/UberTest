@@ -12,11 +12,11 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-const val THREAD_COUNT = 5
+const val THREAD_COUNT = 3
 
 class ImageLoader {
 
-    private val imageViews = Collections.synchronizedMap(WeakHashMap<ImageView, String>())
+    private val imageViews = Collections.synchronizedMap(WeakHashMap<ImageView, String>()) //ImageView, Image Url
     private val executorService: ExecutorService = Executors.newFixedThreadPool(THREAD_COUNT)
 
     private var stubImageId = R.mipmap.ic_launcher
@@ -34,7 +34,6 @@ class ImageLoader {
     }
 
     private fun getBitmap(url: String): Bitmap? {
-
         val imageUrl = URL(url)
         val conn = imageUrl.openConnection() as HttpURLConnection
         conn.requestMethod = "GET"
@@ -53,30 +52,32 @@ class ImageLoader {
     }
 
     //Task for the queue
-    inner class PhotoToLoad internal constructor(var url: String, var imageView: ImageView)
+    data class PhotoToLoad internal constructor(var url: String, var imageView: ImageView)
 
-    inner class PhotosLoader(var photoToLoad: PhotoToLoad) : Runnable {
-
+    inner class PhotosLoader(private var photoToLoad: PhotoToLoad) : Runnable {
         override fun run() {
             if (imageViewReused(photoToLoad))
                 return
             val bmp = getBitmap(photoToLoad.url)
-            val bd = BitmapPresenter(bmp, photoToLoad)
-            val a = photoToLoad.imageView.context as Activity
-            a.runOnUiThread(bd)
+            val bitmapPresenter = BitmapPresenter(bmp, photoToLoad)
+            if (photoToLoad.imageView.context is Activity) {
+                val activity = photoToLoad.imageView.context as Activity
+                activity.runOnUiThread(bitmapPresenter)
+            }
         }
     }
 
     private fun imageViewReused(photoToLoad: PhotoToLoad): Boolean {
-        val tag = imageViews[photoToLoad.imageView]
-        return tag == null || tag != photoToLoad.url
+        val url = imageViews[photoToLoad.imageView]
+        return url == null || url != photoToLoad.url
     }
 
     //Used to display bitmap in the UI thread
-    internal inner class BitmapPresenter(var bitmap: Bitmap?, var photoToLoad: PhotoToLoad) : Runnable {
+    internal inner class BitmapPresenter(private var bitmap: Bitmap?, private var photoToLoad: PhotoToLoad) : Runnable {
         override fun run() {
             if (imageViewReused(photoToLoad))
                 return
+
             if (bitmap != null)
                 photoToLoad.imageView.setImageBitmap(bitmap)
             else
