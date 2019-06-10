@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.ImageView
 import com.example.myapplication.R
-import com.example.myapplication.TIMEOUT
+import com.example.myapplication.common.TIMEOUT
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*

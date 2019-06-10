@@ -1,6 +1,4 @@
-package com.example.myapplication
-
-
+package com.example.myapplication.common
 
 const val API_KEY = "579a5c4bdbc096b04e86a08e2b4781c0"
 const val ITEMS_PER_PAGE = 50

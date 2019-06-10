@@ -1,6 +1,9 @@
 package com.example.myapplication
 
 import android.os.Bundle
+import android.view.KeyEvent
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -31,8 +34,10 @@ class MainActivity : AppCompatActivity() {
         rvImages.adapter = adapter
         viewModel.images.observe(this,
             Observer<List<FlickrPhoto>> { images ->
-                images?.let {
-                    adapter.flickrPhotoList = it
+                if (images != null) {
+                    adapter.flickrPhotoList = images
+                } else {
+                    adapter.flickrPhotoList = ArrayList()
                 }
             })
 
@@ -42,12 +47,23 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        editSearch.setOnEditorActionListener(object : TextView.OnEditorActionListener {
+            override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    v?.let { viewModel.getImagesForQuery(it.text.toString()) }
+                    return true
+                }
+                return false
+            }
+        })
+
         rvImages.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) {
                     val totalItemCount = layoutManager.itemCount
                     val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
-                    if (lastVisiblePosition >= (totalItemCount - (COLUMN_COUNT * 2))) {
+                    //start loading next page before the last row
+                    if (lastVisiblePosition >= (totalItemCount - COLUMN_COUNT)) {
                         viewModel.loadNextPage()
                     }
                 }

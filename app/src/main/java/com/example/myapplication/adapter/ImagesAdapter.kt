@@ -10,7 +10,7 @@ import com.example.myapplication.R
 import com.example.myapplication.loader.ImageLoader
 import com.example.myapplication.model.FlickrPhoto
 
-class ImagesAdapter() :
+class ImagesAdapter:
     RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
     private val imgLoader: ImageLoader = ImageLoader()
 
