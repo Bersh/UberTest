@@ -2,63 +2,62 @@ package com.example.myapplication.loader
 
 import android.app.Activity
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.ImageView
+import androidx.annotation.UiThread
 import com.example.myapplication.R
-import com.example.myapplication.common.TIMEOUT
-import java.net.HttpURLConnection
-import java.net.URL
+import com.example.myapplication.api.ApiManager
+import com.example.myapplication.loader.cache.IImageCache
+import com.example.myapplication.loader.cache.MemoryImgCache
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 const val THREAD_COUNT = 3
 
-class ImageLoader {
+object ImageLoader {
 
     private val imageViews = Collections.synchronizedMap(WeakHashMap<ImageView, String>()) //ImageView, Image Url
     private val executorService: ExecutorService = Executors.newFixedThreadPool(THREAD_COUNT)
+    private val memmoryCache: IImageCache = MemoryImgCache()
+    private val apiManager = ApiManager
 
     private var stubImageId = R.mipmap.ic_launcher
 
+    fun invalidateCache() {
+        memmoryCache.invalidate()
+    }
+
+    @UiThread
     fun displayImage(url: String, loader: Int, imageView: ImageView) {
         stubImageId = loader
         imageViews[imageView] = url
         queuePhoto(url, imageView)
-        imageView.setImageResource(loader)
     }
 
+    @UiThread
     private fun queuePhoto(url: String, imageView: ImageView) {
-        val p = PhotoToLoad(url, imageView)
-        executorService.submit(PhotosLoader(p))
-    }
-
-    private fun getBitmap(url: String): Bitmap? {
-        val imageUrl = URL(url)
-        val conn = imageUrl.openConnection() as HttpURLConnection
-        conn.requestMethod = "GET"
-        val bmOptions = BitmapFactory.Options()
-        bmOptions.inSampleSize = 1
-        conn.connectTimeout = TIMEOUT
-        conn.readTimeout = TIMEOUT
-        conn.instanceFollowRedirects = true
-        conn.doInput = true
-        conn.connect()
-        try {
-            return BitmapFactory.decodeStream(conn.inputStream, null, bmOptions)
-        } finally {
-            conn.inputStream.close()
+        val photoToLoad = PhotoToLoad(url, imageView)
+        val bitmap = memmoryCache.getCachedBitmap(url)
+        if (bitmap != null) {
+            val bitmapPresenter = BitmapPresenter(bitmap, photoToLoad)
+            bitmapPresenter.run()
+        } else if (!imageViewReused(photoToLoad)) {
+            executorService.submit(PhotosLoader(photoToLoad))
+            imageView.setImageResource(stubImageId)
         }
     }
 
     //Task for the queue
     data class PhotoToLoad internal constructor(var url: String, var imageView: ImageView)
 
-    inner class PhotosLoader(private var photoToLoad: PhotoToLoad) : Runnable {
+    private class PhotosLoader(private var photoToLoad: PhotoToLoad) : Runnable {
         override fun run() {
-            if (imageViewReused(photoToLoad))
+            if (imageViewReused(photoToLoad)) {
                 return
-            val bmp = getBitmap(photoToLoad.url)
+            }
+
+            val bmp = apiManager.getBitmap(photoToLoad.url)
             val bitmapPresenter = BitmapPresenter(bmp, photoToLoad)
             if (photoToLoad.imageView.context is Activity) {
                 val activity = photoToLoad.imageView.context as Activity
@@ -73,14 +72,16 @@ class ImageLoader {
     }
 
     //Used to display bitmap in the UI thread
-    internal inner class BitmapPresenter(private var bitmap: Bitmap?, private var photoToLoad: PhotoToLoad) : Runnable {
+    private class BitmapPresenter(private val bitmap: Bitmap?, private var photoToLoad: PhotoToLoad) : Runnable {
         override fun run() {
-            if (imageViewReused(photoToLoad))
+            if (imageViewReused(photoToLoad)) {
                 return
+            }
 
-            if (bitmap != null)
+            if (bitmap != null) {
+                memmoryCache.add(photoToLoad.url, bitmap)
                 photoToLoad.imageView.setImageBitmap(bitmap)
-            else
+            } else
                 photoToLoad.imageView.setImageResource(stubImageId)
         }
     }

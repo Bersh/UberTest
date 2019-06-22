@@ -10,14 +10,12 @@ import com.example.myapplication.R
 import com.example.myapplication.loader.ImageLoader
 import com.example.myapplication.model.FlickrPhoto
 
-class ImagesAdapter :
-    RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
-
+class ImagesAdapter : RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
     init {
         setHasStableIds(true)
     }
 
-    private val imgLoader: ImageLoader = ImageLoader()
+    private val imgLoader: ImageLoader = ImageLoader
 
     var flickrPhotoList: List<FlickrPhoto> = ArrayList()
         set(value) {
