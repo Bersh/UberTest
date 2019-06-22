@@ -40,7 +40,7 @@ class ImagesAdapter :
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val flickrPhoto = flickrPhotoList[position]
-        viewHolder.setData(flickrPhoto, position)
+        viewHolder.setData(flickrPhoto)
     }
 
     class ViewHolder(itemView: View, private val imgLoader: ImageLoader) : RecyclerView.ViewHolder(itemView) {
@@ -50,7 +50,7 @@ class ImagesAdapter :
 
         private var flickrPhoto: FlickrPhoto? = null
 
-        fun setData(photo: FlickrPhoto, position: Int) {
+        fun setData(photo: FlickrPhoto) {
             flickrPhoto = photo
 
             flickrPhoto?.let {
