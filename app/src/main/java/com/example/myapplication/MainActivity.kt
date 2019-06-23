@@ -35,9 +35,9 @@ class MainActivity : AppCompatActivity() {
         viewModel.getDefaultImages()
         rvImages.adapter = adapter
         viewModel.images.observe(this,
-            Observer<List<FlickrPhoto>> { images ->
+            Observer<Collection<FlickrPhoto>> { images ->
                 if (images != null) {
-                    adapter.flickrPhotoList = images
+                    adapter.flickrPhotoList = ArrayList(images)
                 } else {
                     adapter.flickrPhotoList = ArrayList()
                 }

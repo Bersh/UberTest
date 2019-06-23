@@ -20,7 +20,7 @@ interface IPhotosRepository {
     fun getPhotosForQuery(
         searchQuery: String,
         pageNo: Int,
-        imagesData: MutableLiveData<List<FlickrPhoto>>,
+        imagesData: MutableLiveData<Collection<FlickrPhoto>>,
         pagesCountData: MutableLiveData<Int>,
         userMessageData: MutableLiveData<String>,
         isLoadingData: MutableLiveData<Boolean>
@@ -40,7 +40,7 @@ interface IPhotosRepository {
      */
     fun getDefaultPhotos(
         pageNo: Int,
-        imagesData: MutableLiveData<List<FlickrPhoto>>,
+        imagesData: MutableLiveData<Collection<FlickrPhoto>>,
         pagesCountData: MutableLiveData<Int>,
         userMessageData: MutableLiveData<String>,
         isLoadingData: MutableLiveData<Boolean>

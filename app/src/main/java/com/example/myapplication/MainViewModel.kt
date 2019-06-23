@@ -19,7 +19,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     @VisibleForTesting
     val isLoading = MutableLiveData<Boolean>().apply { value = false }
     @VisibleForTesting
-    val images = MutableLiveData<List<FlickrPhoto>>()
+    val images = MutableLiveData<Collection<FlickrPhoto>>()
     @VisibleForTesting
     val page = MutableLiveData<Int>().apply { value = 1 }
     @VisibleForTesting
