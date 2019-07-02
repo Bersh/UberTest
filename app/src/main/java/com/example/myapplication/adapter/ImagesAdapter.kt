@@ -1,31 +1,32 @@
 package com.example.myapplication.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.myapplication.R
-import com.example.myapplication.loader.ImageLoader
-import com.example.myapplication.model.FlickrPhoto
+import com.example.myapplication.model.GifData
 
 class ImagesAdapter : RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
-    init {
-        setHasStableIds(true)
-    }
+//    init {
+//        setHasStableIds(true)
+//    }
 
-    private val imgLoader: ImageLoader = ImageLoader
+//    private val imgLoader: ImageLoader = ImageLoader
 
-    var flickrPhotoList: List<FlickrPhoto> = ArrayList()
+    var flickrPhotoList: List<GifData> = ArrayList()
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
-    override fun getItemId(position: Int): Long {
-        return flickrPhotoList[position].id
-    }
+//    override fun getItemId(position: Int): Long {
+//        return flickrPhotoList[position].id.hashCode()
+//    }
 
     override fun getItemCount(): Int {
         return flickrPhotoList.size
@@ -33,7 +34,7 @@ class ImagesAdapter : RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(viewGroup.context).inflate(R.layout.item_photo, viewGroup, false)
-        return ViewHolder(v, imgLoader)
+        return ViewHolder(v, viewGroup.context)
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
@@ -41,19 +42,23 @@ class ImagesAdapter : RecyclerView.Adapter<ImagesAdapter.ViewHolder>() {
         viewHolder.setData(flickrPhoto)
     }
 
-    class ViewHolder(itemView: View, private val imgLoader: ImageLoader) : RecyclerView.ViewHolder(itemView) {
+    class ViewHolder(itemView: View, private val context: Context) : RecyclerView.ViewHolder(itemView) {
 
         private var imgPhoto: ImageView = itemView.findViewById(R.id.iv_photo_item)
         private var txtTitle: TextView = itemView.findViewById(R.id.txt_photo_item)
 
-        private var flickrPhoto: FlickrPhoto? = null
+        private var flickrPhoto: GifData? = null
 
-        fun setData(photo: FlickrPhoto) {
+        fun setData(photo: GifData) {
             flickrPhoto = photo
 
             flickrPhoto?.let {
-                imgLoader.displayImage(it.imageURL, R.mipmap.ic_launcher, imgPhoto)
-                txtTitle.text = it.title
+                Glide
+                    .with(context) // replace with 'this' if it's in activity
+                    .load(it.imageURL)
+                    .asGif()
+                    .into(imgPhoto)
+                txtTitle.text = it.id
             }
         }
     }

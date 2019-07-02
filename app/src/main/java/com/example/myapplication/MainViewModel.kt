@@ -3,9 +3,8 @@ package com.example.myapplication
 import android.app.Application
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.myapplication.model.FlickrPhoto
+import com.example.myapplication.model.GifData
 import com.example.myapplication.model.repository.IPhotosRepository
 import com.example.myapplication.model.repository.PhotosRepositoryImpl
 
@@ -19,7 +18,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     @VisibleForTesting
     val isLoading = MutableLiveData<Boolean>().apply { value = false }
     @VisibleForTesting
-    val images = MutableLiveData<Collection<FlickrPhoto>>()
+    val images = MutableLiveData<Collection<GifData>>()
     @VisibleForTesting
     val page = MutableLiveData<Int>().apply { value = 1 }
     @VisibleForTesting

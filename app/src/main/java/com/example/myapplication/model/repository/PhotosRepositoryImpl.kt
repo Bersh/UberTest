@@ -5,17 +5,18 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.myapplication.COLUMN_COUNT
 import com.example.myapplication.api.ApiManager
-import com.example.myapplication.model.FlickrPhoto
+import com.example.myapplication.common.ITEMS_PER_PAGE
+import com.example.myapplication.model.GifData
 import com.example.myapplication.model.PhotosResponse
 import com.example.myapplication.model.Result
 import java.lang.ref.WeakReference
 
 class PhotosRepositoryImpl : IPhotosRepository {
-    private val currentPhotosList = LinkedHashSet<FlickrPhoto>()
+    private val currentPhotosList = LinkedHashSet<GifData>()
 
     override fun getPhotosForQuery(
         searchQuery: String, pageNo: Int,
-        imagesData: MutableLiveData<Collection<FlickrPhoto>>,
+        imagesData: MutableLiveData<Collection<GifData>>,
         pagesCountData: MutableLiveData<Int>,
         userMessageData: MutableLiveData<String>,
         isLoadingData: MutableLiveData<Boolean>
@@ -29,7 +30,7 @@ class PhotosRepositoryImpl : IPhotosRepository {
 
     override fun getDefaultPhotos(
         pageNo: Int,
-        imagesData: MutableLiveData<Collection<FlickrPhoto>>,
+        imagesData: MutableLiveData<Collection<GifData>>,
         pagesCountData: MutableLiveData<Int>,
         userMessageData: MutableLiveData<String>,
         isLoadingData: MutableLiveData<Boolean>
@@ -47,10 +48,10 @@ class PhotosRepositoryImpl : IPhotosRepository {
     class GetImagesAsyncTask(
         private val searchText: String,
         private val pageNo: Int,
-        private val currentPhotosList: MutableCollection<FlickrPhoto>,
+        private val currentPhotosList: MutableCollection<GifData>,
         //These WeakReferences should not be needed as all LiveData is stored in ViewModel which survives configuration changes
         //but let's be extra careful
-        private val imagesData: WeakReference<MutableLiveData<Collection<FlickrPhoto>>>,
+        private val imagesData: WeakReference<MutableLiveData<Collection<GifData>>>,
         private val pagesCountData: WeakReference<MutableLiveData<Int>>,
         private val userMessageData: WeakReference<MutableLiveData<String>>,
         private val isLoadingData: WeakReference<MutableLiveData<Boolean>>
@@ -68,16 +69,19 @@ class PhotosRepositoryImpl : IPhotosRepository {
         override fun onPostExecute(result: Result<Exception, PhotosResponse?>) {
             when (result) {
                 is Result.Value -> result.value?.let {
-                    currentPhotosList.addAll(it.flickrPhotoList)
+                    currentPhotosList.addAll(it.data)
                     var i = 1
                     while(currentPhotosList.size % COLUMN_COUNT != 0) {
-                        currentPhotosList.remove(it.flickrPhotoList[it.flickrPhotoList.size - i++])
+                        currentPhotosList.remove(it.data[it.data.size - i++])
                     }
                     imagesData.get()?.value = currentPhotosList
-                    pagesCountData.get()?.value = it.pages
-                    Log.d(GetImagesAsyncTask::class.java.name, "Page $pageNo loaded. Total pages: ${it.pages}")
+                    pagesCountData.get()?.value = it.pagination.total_count / ITEMS_PER_PAGE
+                    Log.d(GetImagesAsyncTask::class.java.name, "Page $pageNo loaded. Total pagination: ${it.pagination}")
                 }
-                is Result.Error -> userMessageData.get()?.value = result.error.message
+                is Result.Error -> {
+                    result.error.printStackTrace()
+                    userMessageData.get()?.value = result.error.message
+                }
             }
 
             isLoadingData.get()?.value = false

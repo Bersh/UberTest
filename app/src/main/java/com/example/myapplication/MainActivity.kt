@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.adapter.ImagesAdapter
-import com.example.myapplication.model.FlickrPhoto
+import com.example.myapplication.model.GifData
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val COLUMN_COUNT = 3
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.getDefaultImages()
         rvImages.adapter = adapter
         viewModel.images.observe(this,
-            Observer<Collection<FlickrPhoto>> { images ->
+            Observer<Collection<GifData>> { images ->
                 if (images != null) {
                     adapter.flickrPhotoList = ArrayList(images)
                 } else {

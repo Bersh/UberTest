@@ -1,7 +1,7 @@
 package com.example.myapplication.model.repository
 
 import androidx.lifecycle.MutableLiveData
-import com.example.myapplication.model.FlickrPhoto
+import com.example.myapplication.model.GifData
 
 interface IPhotosRepository {
     /**
@@ -11,7 +11,7 @@ interface IPhotosRepository {
      * @param searchQuery user entered search query
      * @param pageNo current page number
      * @param imagesData LiveData to return loaded images
-     * @param pagesCountData LiveData to return total pages count
+     * @param pagesCountData LiveData to return total pagination count
      * @param userMessageData LiveData to return user message(used in case of error)
      * @param isLoadingData LiveData to handle loading state changes. Will be true while loading opration is in progress
      *
@@ -20,7 +20,7 @@ interface IPhotosRepository {
     fun getPhotosForQuery(
         searchQuery: String,
         pageNo: Int,
-        imagesData: MutableLiveData<Collection<FlickrPhoto>>,
+        imagesData: MutableLiveData<Collection<GifData>>,
         pagesCountData: MutableLiveData<Int>,
         userMessageData: MutableLiveData<String>,
         isLoadingData: MutableLiveData<Boolean>
@@ -32,7 +32,7 @@ interface IPhotosRepository {
      *
      * @param pageNo current page number
      * @param imagesData LiveData to return loaded images
-     * @param pagesCountData LiveData to return total pages count
+     * @param pagesCountData LiveData to return total pagination count
      * @param userMessageData LiveData to return user message(used in case of error)
      * @param isLoadingData LiveData to handle loading state changes. Will be true while loading opration is in progress
      *
@@ -40,7 +40,7 @@ interface IPhotosRepository {
      */
     fun getDefaultPhotos(
         pageNo: Int,
-        imagesData: MutableLiveData<Collection<FlickrPhoto>>,
+        imagesData: MutableLiveData<Collection<GifData>>,
         pagesCountData: MutableLiveData<Int>,
         userMessageData: MutableLiveData<String>,
         isLoadingData: MutableLiveData<Boolean>
